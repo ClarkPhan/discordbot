@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { fetchStock } from './stock.js';
+import { fetchStock } from './stock';
 import { Client, MessageAttachment } from 'discord.js';
 
 dotenv.config();

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./src/bot.js",
-    "dev": "tsc-watch --onSuccess \"node ./dist/bot.js\""
+    "dev": "nodemon --watch './**/*.ts' --exec 'ts-node' src/bot.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +18,8 @@
     "node-fetch": "^2.6.1",
     "source-map-loader": "^2.0.2",
     "ts-loader": "^8.3.0",
-    "yahoo-finance2": "^1.10.4"
+    "ts-node": "^9.1.1",
+    "yahoo-finance": "^0.3.7"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.24.0",
@@ -26,6 +27,5 @@
     "eslint": "^7.26.0",
     "tsc-watch": "^4.2.9",
     "typescript": "^4.2.4"
-  },
-  "type": "module"
+  }
 }

@@ -1,41 +1,32 @@
-import * as dotenv from 'dotenv';
-import yahooFinance from 'yahoo-finance2';
-import { MessageAttachment, MessageEmbed } from 'discord.js';
-import Client from 'clearbit';
+import 'dotenv/config';
+import * as yahooFinance from 'yahoo-finance';
+import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
+import { Client } from 'clearbit';
 
+// Logo API
 const clearbit = new Client({ key: process.env.CLEARBIT_API_KEY });
-dotenv.config();
 
 // Emojis
 const up = ':chart_with_upwards_trend:';
 const down = ':chart_with_downwards_trend:';
 
-export const fetchStock = async (message, symbol) => {
-	let result;
+export const fetchStock = async (message: Message, symbol: string): Promise<void> => {
 	try {
-	  result = await yahooFinance.quote(symbol);
-	  console.log(result)
+	  const result = await yahooFinance.quote({
+			symbol,
+			modules: ['price', 'summaryDetail', 'summaryProfile']
+		});
+		processStockData(message, symbol, result);
 	} catch (error) {
-		console.log(error);
-	  // Inspect error and decide what to do; often, you may want to just abort:
+		const attachment = new MessageAttachment('./media/monkaX.gif');
+		message.reply(`__**${symbol}**__ is an invalid stock symbol!`, attachment);
 	  return;
 	}
-	
-	// const data = await yahooFinance.quoteSummary(symbol,
-	// 	{
-	// 		modules: ['price', 'summaryDetail', 'summaryProfile']
-	// 	}
-	// ).catch(() => {
-	// 	const attachment = new MessageAttachment('./media/monkaX.gif');
-	// 	message.reply(`__**${symbol}**__ is an invalid stock symbol!`, attachment);
-	// });
-	// console.log(data);
-	// processStockData(message, symbol, data);
 };
 
-const processStockData = (message, symbol, data) => {
+const processStockData = (message: Message, symbol: string, data: any) => {
 	const domain = data.summaryProfile.website;
-	if (!domain) return generateStockEmbedMessage(message, symbol, data, null);
+	if (!domain) return generateStockEmbedMessage(message, symbol, data);
 	const Company = clearbit.Company;
 	Company.find({ domain })
 		.then(res => generateStockEmbedMessage(message, symbol, data, res.logo))
@@ -43,7 +34,7 @@ const processStockData = (message, symbol, data) => {
 		.catch(() => console.log('Bad/invalid request, unauthorized, Clearbit error, or failed request'));
 };
 
-const generateStockEmbedMessage = (message, symbol, data, logo) => {
+const generateStockEmbedMessage = (message: Message, symbol: string, data:any, logo?:string) => {
 	const quote = data.price;
 	const {
 		regularMarketPrice: price,
@@ -53,6 +44,7 @@ const generateStockEmbedMessage = (message, symbol, data, logo) => {
 		regularMarketChange: change,
 		regularMarketChangePercent: changePercent,
 		longName: name,
+		regularMarketTime
 	} = quote;
 	const changes = formatPriceChangeText(change.toFixed(2), (changePercent * 100).toFixed(2));
 	const stockEmbed = new MessageEmbed()
@@ -69,7 +61,7 @@ const generateStockEmbedMessage = (message, symbol, data, logo) => {
 		.addField('Low', `$${low.toFixed(2)}`, true)
 		.setThumbnail(logo)
 		.setFooter('© Clark Phan', 'https://clarkphan.com/assets/images/me.JPG')
-		.setTimestamp();
+		.setTimestamp(regularMarketTime);
 	message.reply(stockEmbed);
 };
 
