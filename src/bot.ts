@@ -1,7 +1,8 @@
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+import { fetchStock } from './stock.js';
+import { Client, MessageAttachment } from 'discord.js';
 
-const stock = require('./stock.js');
-const { Client, MessageAttachment } = require('discord.js');
+dotenv.config();
 const client = new Client();
 const PREFIX = '!';
 const MAX_ARGS = 2;
@@ -21,9 +22,9 @@ client.on('message', (message) => {
 			return message.reply('Please provide stock id, pepelaugh.');
 		} else if (args.length > MAX_ARGS) {
 			const attachment = new MessageAttachment('./media/kekbomb.gif');
-			message.reply(`*Pepelaugh OH NO NO NO* I can only accept up to **2** stock symbols!`, attachment);
+			message.reply('*Pepelaugh OH NO NO NO* I can only accept up to **2** stock symbols!', attachment);
 		} else {
-			args.forEach(symbol => stock.fetchStock(message, symbol));
+			args.forEach(symbol => fetchStock(message, symbol));
 		}
 	}
 });
