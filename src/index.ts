@@ -10,8 +10,10 @@ import {
 	GatewayIntentBits,
 } from 'discord.js';
 
+// Load environment variables
 dotenv.config();
 
+// Initialize client
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
@@ -23,18 +25,18 @@ const client = new Client({
 	],
 });
 
+// Initialize client commands collection
 client.commands = new Collection();
 
-// Reading command files
+// Read command files
 const commandsPath = path.join(__dirname, 'commands');
-
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts'));
 
-// Reading event files
+// Read event files
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.ts'));
 
-// Initialize commands
+// Initialize commands and events
 for (const file of commandFiles) {
 	const filePath = path.join(commandsPath, file);
 	console.log(filePath);
@@ -47,8 +49,6 @@ for (const file of commandFiles) {
 		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
 	}
 }
-
-// Initialize events
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
 	console.log(filePath);
@@ -64,4 +64,5 @@ for (const file of eventFiles) {
 // Deploy server commands
 deployCommands();
 
+// Bot login
 client.login(process.env.DISCORD_BOT_TOKEN);
